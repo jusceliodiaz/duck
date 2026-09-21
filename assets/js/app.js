@@ -17,8 +17,9 @@
      `inert` no resto da página.
    - Tema único e claro: não há alternância nem leitura de preferência do
      sistema, então nada de `data-theme` nem de bloco de tokens escuros.
-   - O vídeo do hero é decorativo e mudo; com `prefers-reduced-motion`
-     ligado no sistema ele nem chega a tocar, ficando só o poster.
+   - O hero é um carrossel só de imagens: sem texto, sem vídeo, com dots
+     como única interface. Ele não gira sozinho quando o sistema pede
+     menos movimento, e para de vez no primeiro clique em um dot.
    ========================================================================== */
 (function () {
   "use strict";
@@ -26,28 +27,14 @@
   /* ------------------------------------------------------------------------
      1. Dados
      ------------------------------------------------------------------------ */
-  var VIEWS = ["front", "q34", "side", "q34b", "back"];
-  var VIEW_LABEL = {
-    front: "de frente",
-    q34: "em três quartos",
-    side: "de perfil",
-    q34b: "em três quartos de costas",
-    back: "de costas"
-  };
-
   var SIZES = {
     mini: { nome: "Mini", detalhe: "65 mm", peso: "~68 g" },
     grande: { nome: "Grande", detalhe: "100 mm", peso: "~210 g" }
   };
 
-  var CATEGORIAS = [
-    { id: "all", nome: "Todos" },
-    { id: "tatico", nome: "Tático" },
-    { id: "faroeste", nome: "Faroeste" },
-    { id: "disfarce", nome: "Disfarce" }
-  ];
-
-  /* preços em centavos; `de` = preço antigo, null quando não há desconto */
+  /* Preços em centavos; `de` = preço antigo, null quando não há desconto.
+     Cada pato tem uma foto só (img/<id>.webp e a versão -sm para card e
+     sacola) — antes eram cinco ângulos por produto. */
   var PRODUTOS = [
     {
       id: "cyber",
@@ -56,7 +43,7 @@
       catNome: "Tático",
       tagline: "Visor fumê, mochila de dados e uma paciência curta.",
       tag: "Mais vendido",
-      rank: 3,
+      rank: 7,
       desc: "O pato que entrou no turno da noite e nunca mais saiu. Armadura em placas chanfradas, headset com almofada circular e duas antenas que sobem retas — tudo modelado em bloco cheio, sem peça colada depois.",
       cores: [["Amarelo", "#FDC024"], ["Cinza escuro", "#4A4A4C"], ["Laranja", "#F0591B"], ["Preto", "#161616"]],
       precos: { mini: 11900, grande: 18900 },
@@ -72,15 +59,15 @@
       }
     },
     {
-      id: "sheriff",
-      nome: "Sheriff Duck",
+      id: "xerif",
+      nome: "Xerife Duck",
       cat: "faroeste",
       catNome: "Faroeste",
       tagline: "Chapéu, estrela e um coldre que nunca foi usado.",
-      tag: "Novo",
-      rank: 2,
+      tag: "",
+      rank: 5,
       desc: "Distintivo de cinco pontas em relevo, bandana com nó real modelado e cinturão com fivela vazada. O chapéu tem aba levemente curvada para imprimir sem suporte — o truque que segura a peça de pé.",
-      cores: [["Amarelo", "#FDC024"], ["Marrom", "#7A5033"], ["Laranja", "#F0591B"], ["Vermelho", "#C4342B"]],
+      cores: [["Amarelo", "#FDC024"], ["Marrom", "#6F4A2E"], ["Vermelho", "#C4342B"], ["Laranja", "#F0591B"]],
       precos: { mini: 10900, grande: 17900 },
       de: { mini: null, grande: null },
       specs: {
@@ -94,23 +81,89 @@
       }
     },
     {
-      id: "agent",
-      nome: "Agent Duck",
-      cat: "disfarce",
-      catNome: "Disfarce",
-      tagline: "Terno preto, maleta fechada, zero perguntas.",
+      id: "ghost",
+      nome: "Ghost Duck",
+      cat: "datas",
+      catNome: "Datas",
+      tagline: "Assombra a estante e pede doces na mesma noite.",
+      tag: "Halloween",
+      rank: 4,
+      desc: "O lençol é uma casca própria, com barra ondulada e dois furos de olho que atravessam de lado a lado. A abóbora vem pendurada na asa, impressa junto, e o vinco do pano cai em ângulos que dispensam suporte.",
+      cores: [["Amarelo", "#FDC024"], ["Branco", "#F2EFE6"], ["Laranja", "#E8761B"], ["Preto", "#161616"]],
+      precos: { mini: 10900, grande: 17900 },
+      de: { mini: null, grande: null },
+      specs: {
+        "Altura (mini)": "65 mm",
+        "Altura (grande)": "100 mm",
+        "Peso": "69 g",
+        "Tempo de impressão": "9 h 05 min",
+        "Trocas de cor": "342",
+        "Altura de camada": "0,12 mm",
+        "Material": "PLA Basic"
+      }
+    },
+    {
+      id: "et",
+      nome: "Alien Duck",
+      cat: "fantasia",
+      catNome: "Fantasia",
+      tagline: "Veio de longe só para ficar parado na sua mesa.",
+      tag: "Novo",
+      rank: 3,
+      desc: "Capuz de alienígena com duas antenas de bolinha e olhos pretos em cúpula lisa, polidos na própria impressão. O emblema no peito é vazado em relevo de 0,6 mm — fundo o bastante para pegar sombra sem virar sujeira.",
+      cores: [["Amarelo", "#FDC024"], ["Verde", "#6E9B3F"], ["Verde escuro", "#3E5B27"], ["Preto", "#161616"]],
+      precos: { mini: 11900, grande: 18900 },
+      de: { mini: null, grande: null },
+      specs: {
+        "Altura (mini)": "65 mm",
+        "Altura (grande)": "100 mm",
+        "Peso": "70 g",
+        "Tempo de impressão": "9 h 20 min",
+        "Trocas de cor": "396",
+        "Altura de camada": "0,12 mm",
+        "Material": "PLA Basic"
+      }
+    },
+    {
+      id: "dino",
+      nome: "Dino Duck",
+      cat: "fantasia",
+      catNome: "Fantasia",
+      tagline: "Extinto há 66 milhões de anos, mas chegou hoje.",
+      tag: "",
+      rank: 2,
+      desc: "Capuz de dinossauro com dentes serrilhados e uma fileira de espinhos que desce pelas costas. Cada espinho fecha em ângulo de 50°, então a crista inteira imprime no ar, sem uma linha de suporte encostando na peça.",
+      cores: [["Amarelo", "#FDC024"], ["Verde musgo", "#5F7A44"], ["Bege", "#D9CBA6"], ["Laranja", "#D2691E"]],
+      precos: { mini: 11900, grande: 18900 },
+      de: { mini: null, grande: null },
+      specs: {
+        "Altura (mini)": "65 mm",
+        "Altura (grande)": "100 mm",
+        "Peso": "73 g",
+        "Tempo de impressão": "9 h 50 min",
+        "Trocas de cor": "404",
+        "Altura de camada": "0,12 mm",
+        "Material": "PLA Basic"
+      }
+    },
+    {
+      id: "cow",
+      nome: "Cow Duck",
+      cat: "fantasia",
+      catNome: "Fantasia",
+      tagline: "Faz muu quando ninguém está olhando.",
       tag: "",
       rank: 1,
-      desc: "Lapela com vinco, gravata em duas camadas e maleta com alça separada do corpo. É o mais limpo de imprimir da coleção: quatro cores, nenhuma ponte acima de 3 mm e base larga que dispensa brim.",
-      cores: [["Amarelo", "#FDC024"], ["Branco", "#F2F2F0"], ["Laranja", "#F0591B"], ["Preto", "#161616"]],
-      precos: { mini: 9900, grande: 16900 },
+      desc: "Pijama de vaca com manchas aplicadas cor a cor, sem decalque, e dois chifres curtos que nascem do capuz. O sininho é uma peça vazada que fica solta dentro do suporte, impressa no lugar — não dá para tirar nem para perder.",
+      cores: [["Amarelo", "#FDC024"], ["Branco", "#F2EFE6"], ["Marrom escuro", "#3A2A22"], ["Rosa", "#E8A9A0"]],
+      precos: { mini: 10900, grande: 17900 },
       de: { mini: 12900, grande: null },
       specs: {
         "Altura (mini)": "65 mm",
         "Altura (grande)": "100 mm",
-        "Peso": "66 g",
-        "Tempo de impressão": "8 h 20 min",
-        "Trocas de cor": "356",
+        "Peso": "72 g",
+        "Tempo de impressão": "9 h 30 min",
+        "Trocas de cor": "428",
         "Altura de camada": "0,12 mm",
         "Material": "PLA Basic"
       }
@@ -149,7 +202,10 @@
     return null;
   }
 
-  function imgSrc(id, view) { return "img/" + id + "_" + view + ".webp"; }
+  /* Uma foto por pato. A versão -sm (480 px) serve card e sacola; a grande
+     (1200 px) serve a página de produto. */
+  function imgSrc(id) { return "img/" + id + ".webp"; }
+  function imgSrcSm(id) { return "img/" + id + "-sm.webp"; }
 
   function lineKey(id, size) { return id + ":" + size; }
 
@@ -166,7 +222,6 @@
   var state = {
     cart: [],          /* [{ id, size, qty }] */
     cupom: null,
-    filtro: "all",
     ordem: "rel",
     busca: "", priceLimit: 0, favoritesOnly: false
   };
@@ -305,12 +360,13 @@
   });
 
   /* ------------------------------------------------------------------------
-     6. Cabeçalho flutuante, vídeo do hero, menu móvel e busca
+     6. Cabeçalho flutuante, carrossel do hero, menu móvel, busca e conta
      ------------------------------------------------------------------------ */
   var header = $("#header");
   var menu = $("#mobileMenu");
   var menuBtn = $("#burger");
-  var heroVideo = $("#heroVideo");
+  var heroViewport = $("#heroViewport");
+  var heroDots = $("#heroDots");
   var mqReduzido = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   /* O cabecalho so vira solido quando o hero sai de baixo dele. Enquanto o
@@ -328,16 +384,97 @@
   window.addEventListener("scroll", sincronizarHeader, { passive: true });
   window.addEventListener("resize", sincronizarHeader, { passive: true });
 
-  /* Video do hero: decorativo, mudo e em loop, sem controles.
-     Quem pediu menos movimento no sistema recebe so o poster. Nao basta
-     chamar pause() na carga: o autoplay ainda nem comecou, entao o pause
-     nao pega nada e o video sobe assim que os dados chegam. O jeito
-     confiavel e barrar todo play enquanto a preferencia estiver ligada. */
-  if (heroVideo && mqReduzido.matches) {
-    heroVideo.autoplay = false;
-    heroVideo.removeAttribute("autoplay");
-    heroVideo.addEventListener("play", function () { heroVideo.pause(); });
-    heroVideo.pause();
+  /* ------------------------------------------------------------------------
+     Carrossel do hero
+     A única interface são os dots. A troca é por fade (sem deslocar nada
+     na horizontal, então não há risco de barra de rolagem lateral).
+
+     Acessibilidade: cada slide é um group com aria-roledescription="slide";
+     o slide fora de cena recebe `inert`, senão o link ou a imagem dele
+     continuariam alcançáveis pelo teclado. Os dots são botões de verdade,
+     com nome acessível e aria-current casando com o visual, e navegam
+     entre si pelas setas com roving tabindex.
+
+     O giro automático para de vez no primeiro clique em um dot (quem
+     assumiu o controle não quer ser interrompido) e nem começa quando o
+     sistema pede menos movimento.
+     ------------------------------------------------------------------------ */
+  if (heroViewport && heroDots) {
+    (function () {
+      var slides = $$(".hero__slide", heroViewport);
+      var INTERVALO = 5500;
+      var atual = 0;
+      var timer = null;
+      var girando = !mqReduzido.matches && slides.length > 1;
+
+      heroDots.innerHTML = slides.map(function (_, i) {
+        return '<button type="button" class="hero__dot" data-slide="' + i + '"' +
+          ' aria-current="' + (i === 0) + '" tabindex="' + (i === 0 ? "0" : "-1") + '"' +
+          ' aria-label="Ver foto ' + (i + 1) + " de " + slides.length + '"></button>';
+      }).join("");
+      var dots = $$(".hero__dot", heroDots);
+
+      function mostrar(i) {
+        atual = (i + slides.length) % slides.length;
+        slides.forEach(function (sl, k) {
+          var ativo = k === atual;
+          sl.classList.toggle("is-active", ativo);
+          if (ativo) sl.removeAttribute("inert");
+          else sl.setAttribute("inert", "");
+        });
+        dots.forEach(function (d, k) {
+          var ativo = k === atual;
+          d.setAttribute("aria-current", String(ativo));
+          d.tabIndex = ativo ? 0 : -1;
+        });
+      }
+
+      function agendar() {
+        window.clearTimeout(timer);
+        if (!girando) return;
+        timer = window.setTimeout(function () {
+          mostrar(atual + 1);
+          agendar();
+        }, INTERVALO);
+      }
+
+      function parar() { girando = false; window.clearTimeout(timer); }
+
+      heroDots.addEventListener("click", function (e) {
+        var d = e.target.closest(".hero__dot");
+        if (!d) return;
+        parar();
+        mostrar(parseInt(d.dataset.slide, 10));
+        dots[atual].focus();
+      });
+
+      heroDots.addEventListener("keydown", function (e) {
+        var passo = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (!passo) return;
+        e.preventDefault();
+        parar();
+        mostrar(atual + passo);
+        dots[atual].focus();
+      });
+
+      /* pausa enquanto o ponteiro ou o foco estiverem dentro do hero */
+      var hero = $("#heroCarrossel");
+      ["mouseenter", "focusin"].forEach(function (ev) {
+        hero.addEventListener(ev, function () { window.clearTimeout(timer); });
+      });
+      ["mouseleave", "focusout"].forEach(function (ev) {
+        hero.addEventListener(ev, function () { agendar(); });
+      });
+
+      /* aba em segundo plano não precisa girar */
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) window.clearTimeout(timer);
+        else agendar();
+      });
+
+      mostrar(0);
+      agendar();
+    }());
   }
 
   /* Menu movel. O `hidden` some antes de animar; sem forcar um reflow entre
@@ -386,6 +523,132 @@
   }
   $$(".js-search").forEach(ligarBusca);
 
+  /* Busca em icone -----------------------------------------------------------
+     Nao passa pelo abrirOverlay de proposito: aquele trava a rolagem e poe
+     `inert` na pagina, e aqui a pessoa precisa justamente ver a grade sendo
+     filtrada atras. O que ele tem de modal, mantemos a mao: Escape fecha,
+     clique fora fecha, e o foco sempre volta para o icone. */
+  (function () {
+    var barra = $("#searchBar");
+    var botao = $("#searchBtn");
+    var campo = $("#search");
+    if (!barra || !botao) return;
+
+    function abrir() {
+      barra.hidden = false;
+      /* sem isso o cabecalho continuaria em modo claro — e com a barra aberta
+         ele deixa de estar sobre a foto, ficando texto claro em fundo claro */
+      $("#header").classList.add("is-search");
+      botao.setAttribute("aria-expanded", "true");
+      campo.focus();
+      campo.select();
+    }
+
+    function fechar(devolverFoco) {
+      if (barra.hidden) return;
+      barra.hidden = true;
+      $("#header").classList.remove("is-search");
+      botao.setAttribute("aria-expanded", "false");
+      if (devolverFoco) botao.focus();
+    }
+
+    botao.addEventListener("click", function () {
+      if (barra.hidden) abrir(); else fechar(true);
+    });
+    $("#searchClose").addEventListener("click", function () { fechar(true); });
+
+    /* Enter nao deve recarregar a pagina: o filtro ja e ao vivo. */
+    campo.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); fechar(true); }
+      if (e.key === "Escape") { e.preventDefault(); fechar(true); }
+    });
+
+    /* Clique fora fecha — mas nao quando ha um overlay de verdade por cima,
+       senao a sacola aberta fecharia a barra junto. */
+    document.addEventListener("click", function (e) {
+      if (barra.hidden || pilha.length) return;
+      if (barra.contains(e.target) || botao.contains(e.target)) return;
+      fechar(false);
+    });
+  }());
+
+  /* Assinatura do rodape ----------------------------------------------------
+     Mesma regra do modal de conta: nada sai do navegador, e o aviso esta na
+     tela antes de a pessoa digitar, nao so depois de enviar. */
+  (function () {
+    var form = $("#signupForm");
+    if (!form) return;
+    var email = $("#signupEmail");
+    var erro = $("#signupError");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var valor = email.value.trim();
+      if (!valor || valor.indexOf("@") < 1 || valor.indexOf(".") < valor.indexOf("@")) {
+        erro.textContent = "Digite um e-mail válido, como nome@email.com.";
+        email.setAttribute("aria-invalid", "true");
+        email.focus();
+        return;
+      }
+      erro.textContent = "";
+      email.removeAttribute("aria-invalid");
+      email.value = "";
+      toast("Protótipo: a assinatura não foi enviada.");
+    });
+
+    email.addEventListener("input", function () {
+      erro.textContent = "";
+      email.removeAttribute("aria-invalid");
+    });
+  }());
+
+  /* Entrar -------------------------------------------------------------------
+     Prototipo: nenhum provedor e chamado e nada sai do navegador. O modal
+     existe para o fluxo ficar completo, entao ele diz isso na cara em vez de
+     simular um login que nao acontece. Sem campo de senha por isso mesmo. */
+  (function () {
+    var modal = $("#authModal");
+    var botao = $("#accountBtn");
+    if (!modal || !botao) return;
+    var erro = $("#authError");
+    var email = $("#authEmail");
+
+    function abrir() {
+      modal.hidden = false;
+      erro.textContent = "";
+      email.value = "";
+      email.removeAttribute("aria-invalid");
+      abrirOverlay(modal, fechar, $("#authClose"));
+    }
+    function fechar() {
+      modal.hidden = true;
+      fecharOverlay(modal);
+    }
+
+    botao.addEventListener("click", abrir);
+    $("#authClose").addEventListener("click", fechar);
+    modal.addEventListener("click", function (e) {
+      if (e.target.closest("[data-auth-close]")) { fechar(); return; }
+      var sso = e.target.closest("[data-sso]");
+      if (sso) { fechar(); toast("Protótipo: o login com " + sso.dataset.sso + " não está ligado."); }
+    });
+
+    $("#authForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var valor = email.value.trim();
+      /* validacao rasa de proposito: so o suficiente para o erro aparecer
+         junto do campo, que e onde a pessoa esta olhando */
+      if (!valor || valor.indexOf("@") < 1 || valor.indexOf(".") < valor.indexOf("@")) {
+        erro.textContent = "Digite um e-mail válido, como nome@email.com.";
+        email.setAttribute("aria-invalid", "true");
+        email.focus();
+        return;
+      }
+      fechar();
+      toast("Protótipo: nenhuma conta foi criada e o e-mail não foi enviado.");
+    });
+  }());
+
   /* ------------------------------------------------------------------------
      7. Marquee
      ------------------------------------------------------------------------ */
@@ -427,7 +690,9 @@
     return '<li class="card">' +
       '<div class="card__media">' + favoriteHTML(p) +
         (p.tag ? '<span class="card__tag">' + esc(p.tag) + "</span>" : "") +
-        '<img src="' + imgSrc(p.id, "front") + '" alt="' + esc(p.nome) + ', visto de frente" width="860" height="860" loading="lazy" decoding="async">' +
+        '<img src="' + imgSrcSm(p.id) + '" srcset="' + imgSrcSm(p.id) + ' 480w, ' + imgSrc(p.id) + ' 1200w"' +
+          ' sizes="(max-width: 560px) 100vw, (max-width: 900px) 46vw, 30vw"' +
+          ' alt="' + esc(p.nome) + '" width="1200" height="1200" loading="lazy" decoding="async">' +
         '<span class="swatches" aria-hidden="true">' + swatches + "</span>" +
       "</div>" +
       '<div class="card__body">' +
@@ -445,9 +710,10 @@
     var termo = state.busca.trim().toLowerCase();
 
     var lista = PRODUTOS.filter(function (p) {
-      var passaFiltro = state.filtro === "all" || p.cat === state.filtro;
       var alvo = (p.nome + " " + p.tagline + " " + p.catNome + " " + p.desc).toLowerCase();
-      return passaFiltro && (!state.priceLimit || p.precos.mini <= state.priceLimit) && (!state.favoritesOnly || favorites.indexOf(p.id) !== -1) && (!termo || alvo.indexOf(termo) > -1);
+      return (!state.priceLimit || p.precos.mini <= state.priceLimit) &&
+        (!state.favoritesOnly || favorites.indexOf(p.id) !== -1) &&
+        (!termo || alvo.indexOf(termo) > -1);
     });
 
     lista.sort(function (a, b) {
@@ -470,37 +736,6 @@
 
   /* Os chips são um grupo de rádio de verdade: um só selecionado, setas do
      teclado navegam e só o ativo fica na ordem de tabulação. */
-  var filtrosEl = $("#filters");
-  filtrosEl.innerHTML = CATEGORIAS.map(function (c, i) {
-    return '<button type="button" role="radio" class="chip" data-filter="' + esc(c.id) + '"' +
-      ' aria-checked="' + (i === 0) + '" tabindex="' + (i === 0 ? "0" : "-1") + '">' + esc(c.nome) + "</button>";
-  }).join("");
-
-  function selecionarFiltro(btn) {
-    state.filtro = btn.dataset.filter;
-    $$(".chip", filtrosEl).forEach(function (c) {
-      var ativo = c === btn;
-      c.setAttribute("aria-checked", String(ativo));
-      c.tabIndex = ativo ? 0 : -1;
-    });
-    btn.focus();
-    renderGrid();
-  }
-
-  filtrosEl.addEventListener("click", function (e) {
-    var btn = e.target.closest(".chip");
-    if (btn) selecionarFiltro(btn);
-  });
-
-  filtrosEl.addEventListener("keydown", function (e) {
-    var passo = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
-    if (!passo) return;
-    e.preventDefault();
-    var chips = $$(".chip", filtrosEl);
-    var atual = chips.indexOf(document.activeElement);
-    selecionarFiltro(chips[(atual + passo + chips.length) % chips.length]);
-  });
-
   $("#sort").addEventListener("change", function () { state.ordem = this.value; renderGrid(); });
 
   gridEl.addEventListener("click", function (e) {
@@ -508,7 +743,6 @@
       resetCatalog();
       state.busca = "";
       $$(".js-search").forEach(function (i) { i.value = ""; });
-      selecionarFiltro($(".chip", filtrosEl));
     }
   });
 
@@ -516,7 +750,9 @@
   function resetCatalog() {
     state.priceLimit = 0; state.favoritesOnly = false; state.busca = ""; state.ordem = "rel";
     $("#priceLimit").value = "0"; $("#sort").value = "rel"; $("#favoritesOnly").setAttribute("aria-pressed", "false");
-    $$(".js-search").forEach(function(n) { n.value = ""; }); selecionarFiltro($(".chip", filtrosEl));
+    $$(".js-search").forEach(function (n) { n.value = ""; });
+    /* o redesenho vinha da seleção do chip "Todos", que deixou de existir */
+    renderGrid();
   }
   $("#priceLimit").addEventListener("change", function() { state.priceLimit = Number(this.value); renderGrid(); });
   $("#favoritesOnly").addEventListener("click", function() { state.favoritesOnly = !state.favoritesOnly; this.setAttribute("aria-pressed", String(state.favoritesOnly)); renderGrid(); });
@@ -546,16 +782,9 @@
      Agora o HTML é montado uma vez por produto e depois só é atualizado.
      ------------------------------------------------------------------------ */
   var pdpEl = $("#pdp");
-  var pdp = { id: null, view: "front", size: "mini", qty: 1, refs: null };
+  var pdp = { id: null, size: "mini", qty: 1, refs: null };
 
   function montarPDP(p) {
-    var thumbs = VIEWS.map(function (v, i) {
-      return '<button type="button" role="radio" class="thumb" data-view="' + v + '"' +
-        ' aria-checked="' + (i === 0) + '" tabindex="' + (i === 0 ? "0" : "-1") + '">' +
-        '<img src="' + imgSrc(p.id, v) + '" alt="' + esc(p.nome) + " " + esc(VIEW_LABEL[v]) +
-        '" width="860" height="860" loading="lazy" decoding="async"></button>';
-    }).join("");
-
     var specs = Object.keys(p.specs).filter(function(k) { return ["Tempo de impressão", "Trocas de cor", "Altura de camada", "Peso"].indexOf(k) === -1; }).map(function (k) {
       return "<dt>" + esc(k) + "</dt><dd>" + esc(p.specs[k]) + "</dd>";
     }).join("");
@@ -576,9 +805,8 @@
       '<a class="back-link" href="#colecao">&larr; Voltar para a coleção</a>' +
       '<div class="pdp">' +
         "<div>" +
-          '<div class="gallery__main"><img id="pdpMain" src="' + imgSrc(p.id, "front") + '" alt="' + esc(p.nome) +
-            ' ' + esc(VIEW_LABEL.front) + '" width="860" height="860" decoding="async"></div>' +
-          '<div class="gallery__thumbs" id="pdpThumbs" role="radiogroup" aria-label="Ângulos da foto">' + thumbs + "</div>" +
+          '<figure class="gallery"><img id="pdpMain" src="' + imgSrc(p.id) + '" alt="' + esc(p.nome) +
+            '" width="1200" height="1200" fetchpriority="high" decoding="async"></figure>' +
         "</div>" +
         "<div>" +
           '<p class="eyebrow">Coleção 01 &middot; ' + esc(p.catNome) + "</p>" +
@@ -613,8 +841,6 @@
 
     pdpEl.insertAdjacentHTML("beforeend", '<div class="product-extras">' + favoriteHTML(p) + '<a class="text-action" href="#sizeGuide">Guia de tamanhos</a><a class="text-action" href="#entrega">Entrega e cuidados</a></div><section class="section"><p class="eyebrow">Turno da Noite</p><h2>Complete a turma</h2><ul class="grid related-grid">' + PRODUTOS.filter(function(other) { return other.id !== p.id; }).map(cardHTML).join("") + '</ul></section>');
     pdp.refs = {
-      main: $("#pdpMain"),
-      thumbs: $("#pdpThumbs"),
       sizes: $("#pdpSizes"),
       preco: $("#pdpPrice"),
       parcela: $("#pdpParcel"),
@@ -623,11 +849,6 @@
       qtyPlus: $("#qtyPlus"),
       add: $("#pdpAdd")
     };
-
-    ligarRadiogroup(pdp.refs.thumbs, ".thumb", function (btn) {
-      pdp.view = btn.dataset.view;
-      atualizarPDP(p);
-    });
 
     ligarRadiogroup(pdp.refs.sizes, ".size", function (btn) {
       pdp.size = btn.dataset.size;
@@ -674,9 +895,6 @@
     var preco = p.precos[pdp.size];
     var de = p.de[pdp.size];
 
-    r.main.src = imgSrc(p.id, pdp.view);
-    r.main.alt = p.nome + " " + VIEW_LABEL[pdp.view];
-
     var precoHTML = "<b>" + brl(preco) + "</b>";
     if (de && de > preco) {
       precoHTML += "<s>" + brl(de) + '</s><span class="off">&minus;' +
@@ -699,7 +917,7 @@
     var p = produtoPorId(id);
     if (!p) { location.hash = "#/"; return; }
     if (pdp.id !== id) {
-      pdp.id = id; pdp.view = "front"; pdp.size = "mini"; pdp.qty = 1;
+      pdp.id = id; pdp.size = "mini"; pdp.qty = 1;
       montarPDP(p);
       recent = [id].concat(recent.filter(function(other) { return other !== id; })).slice(0, 3);
       writeStorage("dd_recent_v1", JSON.stringify(recent)); renderRecent();
@@ -773,7 +991,7 @@
       var p = produtoPorId(l.id);
       var nomeItem = p.nome + " tamanho " + SIZES[l.size].nome;
       return '<li class="line">' +
-        '<span class="line__media"><img src="' + imgSrc(p.id, "front") + '" alt="" width="860" height="860" loading="lazy"></span>' +
+        '<span class="line__media"><img src="' + imgSrcSm(p.id) + '" alt="" width="480" height="480" loading="lazy"></span>' +
         "<div><b>" + esc(p.nome) + "</b>" +
         '<span class="line__meta">' + esc(SIZES[l.size].nome + " · " + SIZES[l.size].detalhe) + "</span>" +
         '<span class="line__qty">' +

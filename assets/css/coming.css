@@ -1,0 +1,280 @@
+/* ==========================================================================
+   Duck Dodgers — página de espera
+   Palco escuro e quente, luz amarela da marca. O elenco no meio, grande; a
+   fala logo abaixo, em peso secundário.
+   Ao fundo, colunas de fotos deslizando bem apagadas — textura, não conteúdo.
+   ========================================================================== */
+
+:root {
+  --ink:        #14120D;   /* preto quente, da mesma familia do ink da loja */
+  --ink-2:      #1D1A13;
+  --brand:      #FFC220;
+  --brand-soft: #FFE9A8;
+  --paper:      #F7F3E8;
+  --paper-2:    #C9C4B4;   /* texto secundario: 7,9:1 sobre o fundo */
+  --line:       #ffffff1f;
+  --ease:       cubic-bezier(.2, .7, .3, 1);
+}
+
+* { box-sizing: border-box; }
+html { color-scheme: dark; }
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'Instrument Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+
+/* Fundo ====================================================================
+   Três camadas empilhadas: fotos correndo, luz por cima, granulado por cima
+   de tudo. O conteúdo fica acima das três.
+
+   As colunas DESLIZAM, não saltam. Cada uma corre num tempo e num sentido
+   diferentes, então o olho nunca fecha o padrão — o que dava aspecto de
+   xadrez antes era o salto de posição a cada 3,4 s.
+   ========================================================================== */
+.backdrop {
+  position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  display: flex; gap: clamp(10px, 1.2vw, 18px); padding: 0 clamp(10px, 1.2vw, 18px);
+  /* apagado de propósito: aqui é textura, não conteúdo */
+  opacity: .3;
+  filter: saturate(.62) brightness(.9) blur(.8px);
+  /* buraco no meio: o miolo fica limpo para o texto, as fotos vivem nas bordas */
+  -webkit-mask-image: radial-gradient(ellipse 58% 48% at 50% 44%, transparent 12%, #000 80%);
+          mask-image: radial-gradient(ellipse 58% 48% at 50% 44%, transparent 12%, #000 80%);
+}
+
+.strip { flex: 1; min-width: 0; }
+
+.strip__track {
+  display: flex; flex-direction: column; gap: clamp(10px, 1.2vw, 18px);
+  will-change: transform;
+  /* a lista vai duplicada dentro do track: a -50% cai exatamente sobre o
+     começo da cópia, então o laço fecha sem emenda visível */
+  animation: correr var(--dur, 100s) linear infinite;
+  animation-direction: var(--dir, normal);
+  animation-delay: var(--atraso, 0s);
+}
+@keyframes correr { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+
+.strip img {
+  width: 100%; height: auto; aspect-ratio: 4 / 5;
+  object-fit: cover; display: block; border-radius: 14px;
+}
+
+/* Só as duas primeiras colunas em telas estreitas: cinco viram tiras finas. */
+.strip:nth-child(n+3) { display: none; }
+@media (min-width: 620px)  { .strip:nth-child(3) { display: block; } }
+@media (min-width: 1000px) { .strip:nth-child(4) { display: block; } }
+@media (min-width: 1320px) { .strip:nth-child(5) { display: block; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .strip__track { animation: none; }
+}
+
+.glow {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(58% 44% at 50% 40%, rgb(20 18 13 / .88), rgb(20 18 13 / .5) 62%, transparent 82%),
+    radial-gradient(60% 45% at 50% 22%, rgb(255 194 32 / .14), transparent 70%),
+    radial-gradient(90% 60% at 50% 100%, rgb(255 194 32 / .07), transparent 65%),
+    linear-gradient(180deg, rgb(29 26 19 / .72), rgb(20 18 13 / .46) 40%, rgb(20 18 13 / .78));
+}
+.grain {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
+}
+
+/* Cabeçalho e rodapé ------------------------------------------------------- */
+header, footer {
+  position: relative; z-index: 4;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; padding: 24px 4vw;
+}
+header > a {
+  display: block; background: var(--paper);
+  padding: 7px 14px; border-radius: 12px;
+}
+header img { width: 118px; height: auto; display: block; }
+
+.status {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 700; letter-spacing: .18em;
+  color: var(--paper-2);
+}
+.status i {
+  width: 7px; height: 7px; border-radius: 50%; flex: none;
+  background: var(--brand); box-shadow: 0 0 16px var(--brand);
+}
+
+footer {
+  justify-content: center;   /* sobrou um item só */
+  font-size: 12px; letter-spacing: .06em;
+  color: var(--paper-2);            /* antes #c5c4bf a 9 px: 2,69:1 */
+  border-top: 1px solid var(--line);
+  margin-top: 8px; padding-top: 22px; padding-bottom: 26px;
+}
+
+/* Palco ====================================================================
+   Os patos ocupam o meio, grandes, em faixa larga. O texto vem abaixo, em
+   corpo e peso menores: ele apoia a imagem, não disputa com ela.
+   ========================================================================== */
+main {
+  position: relative; z-index: 3; flex: 1;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  gap: clamp(34px, 6vh, 68px);
+  width: 100%; max-width: 1400px; margin: 0 auto;
+  padding: clamp(20px, 3vh, 40px) clamp(20px, 3vw, 48px);
+}
+
+/* O elenco sobe visualmente sem mudar de lugar no HTML. */
+.cast { order: -1; }
+
+.say { width: 100%; max-width: 660px; text-align: center; }
+
+.eyebrow {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  margin: 0;
+  font-size: 11.5px; font-weight: 600; letter-spacing: .26em;
+  color: var(--brand-soft);
+}
+.eyebrow span { width: 26px; height: 1px; background: currentColor; flex: none; }
+
+/* Peso secundário: o título continua sendo o h1, mas em corpo e peso menores
+   — quem manda na tela agora são as fotos. */
+h1 {
+  margin: 14px 0 0;
+  font: 700 clamp(26px, 2.9vw, 40px)/1.12 'Bricolage Grotesque', sans-serif;
+  letter-spacing: -.028em;
+  text-wrap: nowrap;
+}
+h1 em { font-style: normal; color: var(--brand); }
+
+.intro {
+  margin: 14px auto 0; max-width: 52ch;
+  font-size: 15.5px; line-height: 1.6; color: var(--paper-2);
+}
+
+/* Formulário --------------------------------------------------------------- */
+form { max-width: 440px; margin: 24px auto 0; }
+form > label { display: block; margin-bottom: 11px; font-size: 14px; font-weight: 600; }
+
+.email-field {
+  display: flex; gap: 6px; padding: 6px;
+  background: var(--paper); border-radius: 14px;
+  box-shadow: 0 12px 46px rgb(0 0 0 / .45);
+}
+.email-field input {
+  flex: 1; min-width: 0; border: 0; background: transparent;
+  padding: 13px 14px; color: #262319; outline-offset: -2px;
+}
+.email-field input::placeholder { color: #6C6858; }
+.email-field input[aria-invalid="true"] { outline: 2px solid #C0261B; outline-offset: -2px; }
+
+.email-field button {
+  border: 0; border-radius: 9px; padding: 15px 20px;
+  background: var(--brand); color: #221B05;
+  font-weight: 700; white-space: nowrap;
+  transition: background 140ms var(--ease);
+}
+.email-field button:hover:not(:disabled) { background: #FFD65E; }
+.email-field button:disabled { opacity: .55; cursor: not-allowed; }
+.email-field button span { margin-left: 9px; }
+
+#formMessage { margin: 12px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--brand-soft); }
+#formMessage:empty { display: none; }
+#formMessage[data-erro="1"] { color: #FFB3A6; }
+
+.privacy { margin: 14px 0 0; font-size: 12px; line-height: 1.6; color: var(--paper-2); }
+
+.honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+/* O elenco -----------------------------------------------------------------
+   Seis fotos, cada uma uma vez, em lugar fixo — agora em faixa larga e no
+   centro da tela. */
+.cast { width: 100%; }
+
+.cast ul {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(12px, 1.5vw, 22px);
+  align-items: start;
+}
+.cast figure { margin: 0; }
+
+.cast img {
+  /* height:auto e obrigatorio: os atributos width/height do HTML viram dica de
+     estilo, e sem isso a altura fica presa em 480px e o aspect-ratio nao vale */
+  width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; display: block;
+  border-radius: clamp(14px, 1.4vw, 22px); border: 1px solid var(--line);
+  background: var(--ink-2);
+  box-shadow: 0 18px 44px rgb(0 0 0 / .34);
+}
+
+.cast figcaption {
+  margin-top: 11px;
+  font-size: 12.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--paper-2);
+}
+
+/* Zigue-zague: seis quadrados perfeitamente alinhados viram planilha. */
+.cast li:nth-child(even) { transform: translateY(clamp(10px, 1.2vw, 20px)); }
+
+/* Entrada: acontece uma vez, no carregamento. Não é laço.
+   A ordem dos atrasos segue o que se vê (elenco primeiro), não o HTML. */
+@media (prefers-reduced-motion: no-preference) {
+  .say > *, .cast { animation: sobe .7s var(--ease) backwards; }
+  .cast li { animation: sobe .6s var(--ease) backwards; animation-delay: calc(.1s + var(--i) * .07s); }
+  .eyebrow { animation-delay: .52s; }
+  h1       { animation-delay: .58s; }
+  .intro   { animation-delay: .64s; }
+  form     { animation-delay: .7s; }
+  .cast    { animation: none; }
+}
+@keyframes sobe { from { opacity: 0; transform: translateY(16px); } }
+/* o deslocamento do zigue-zague tem de sobreviver ao fim da animação */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes sobe-par { from { opacity: 0; transform: translateY(calc(16px + clamp(10px, 1.2vw, 20px))); } }
+  .cast li:nth-child(even) { animation-name: sobe-par; }
+}
+
+.noscript { position: relative; z-index: 4; text-align: center; padding: 0 24px; }
+
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 4px; border-radius: 4px; }
+
+/* Telas menores ------------------------------------------------------------ */
+@media (max-width: 900px) {
+  main { gap: clamp(26px, 4vh, 40px); justify-content: flex-start; padding-top: clamp(18px, 3vh, 32px); }
+  .cast ul { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: clamp(18px, 3vw, 28px); }
+  .cast li:nth-child(even) { transform: none; animation-name: sobe; }
+  h1 { font-size: clamp(26px, 4.6vw, 38px); }
+}
+
+@media (max-width: 640px) {
+  header { padding: 18px 22px; }
+  header img { width: 100px; }
+  .status { font-size: 10px; letter-spacing: .12em; max-width: 140px; line-height: 1.5; }
+  main { padding: 18px 20px 0; }
+  h1 { font-size: clamp(24px, 6.4vw, 34px); letter-spacing: -.024em; }
+  .intro { font-size: 15px; }
+  .email-field { flex-wrap: wrap; }
+  .email-field input { flex-basis: 100%; }
+  .email-field button { width: 100%; }
+  footer { flex-direction: column; gap: 10px; text-align: center; font-size: 11.5px; }
+}
+
+/* O título não quebra (text-wrap: nowrap), então em telas muito estreitas ele
+   precisa encolher — senão estoura para fora em vez de passar para a linha
+   de baixo. Abaixo de 320 px não há aparelho comum, mas há zoom de texto. */
+@media (max-width: 380px) {
+  h1 { font-size: clamp(19px, 6.2vw, 26px); }
+}

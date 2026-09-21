@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Duck Dodgers — patos colecionáveis com personalidade</title>
+<meta name="description" content="Patos colecionáveis impressos em 3D em São Paulo: quatro cores reais no filamento, camada de 0,12 mm e lote pequeno. Protótipo de loja.">
+<meta name="theme-color" content="#FAF6EC">
+<meta name="color-scheme" content="light">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Duck Dodgers — patos colecionáveis com personalidade">
+<meta property="og:description" content="Colecionáveis FDM em lote pequeno, com quatro cores reais no filamento.">
+<meta property="og:image" content="img/cyber.webp">
+<meta property="og:locale" content="pt_BR">
+
+<link rel="icon" href="img/logo.webp" type="image/webp">
+<link rel="apple-touch-icon" href="img/logo.webp">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+
+<script defer src="assets/js/app.js"></script>
+</head>
+
+<body>
+
+<a class="skip-link" href="#viewHome">Pular para o conteúdo</a>
+
+<!-- Tudo que fica atrás de sacola/checkout: recebe `inert` quando um overlay abre. -->
+<div id="appRoot">
+
+  <p class="notice">
+    Protótipo de loja &middot; nenhum pagamento é processado e nenhum pedido é enviado — teste o fluxo à vontade na <b>Duck Dodgers</b>
+  </p>
+
+  <header class="header" id="header">
+    <div class="shell header__in">
+      <a href="#/" class="logo" aria-label="Duck Dodgers, ir para a página inicial">
+        <img src="img/logo.webp" alt="" width="560" height="290">
+      </a>
+
+      <nav class="nav" aria-label="Principal">
+        <a href="#colecao">Coleção</a>
+        <a href="#encomenda">Sob encomenda</a>
+      </nav>
+
+      <div class="header__right">
+        <!-- A busca virou so o icone. aria-expanded + aria-controls contam a
+             quem usa leitor de tela que o botao abre a barra logo abaixo. -->
+        <button type="button" class="icon-btn" id="searchBtn"
+                aria-label="Buscar patos" aria-expanded="false" aria-controls="searchBar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </button>
+
+        <button type="button" class="icon-btn" id="accountBtn"
+                aria-haspopup="dialog" aria-label="Entrar na sua conta">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8.2" r="3.6"/><path d="M4.9 20a7.3 7.3 0 0 1 14.2 0"/></svg>
+        </button>
+
+        <button type="button" class="icon-btn cart-btn" id="cartBtn" aria-label="Abrir sacola, vazia">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 7h12l1.2 12.2a1.5 1.5 0 0 1-1.5 1.8H6.3a1.5 1.5 0 0 1-1.5-1.8Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>
+          <span class="cart-btn__count" id="cartCount" aria-hidden="true" hidden>0</span>
+        </button>
+
+        <button type="button" class="icon-btn burger" id="burger" aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- De proposito NAO e modal: a barra filtra a grade que esta logo abaixo,
+         entao travar a rolagem esconderia justamente o resultado. Fecha no
+         Escape, no X e ao clicar fora, sempre devolvendo o foco ao icone. -->
+    <div class="searchbar" id="searchBar" hidden>
+      <div class="shell searchbar__in">
+        <div class="searchbar__field">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <label class="sr-only" for="search">Buscar patos</label>
+          <input class="js-search" id="search" type="search" placeholder="Buscar patos…" autocomplete="off">
+        </div>
+        <button type="button" class="icon-btn" id="searchClose" aria-label="Fechar busca">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==================== HOME ==================== -->
+    <div id="viewHome" tabindex="-1">
+
+      <!-- O <h1> da página vive aqui porque o hero é só imagem: sem ele a
+           página ficaria sem título de primeiro nível. -->
+      <h1 class="sr-only">Duck Dodgers — patos colecionáveis impressos em 3D</h1>
+
+      <section class="hero" id="heroCarrossel"
+               aria-roledescription="carrossel" aria-label="Fotos da coleção">
+        <div class="hero__viewport" id="heroViewport">
+          <figure class="hero__slide is-active" role="group"
+                  aria-roledescription="slide" aria-label="1 de 3: Dino Duck no jardim">
+            <img src="img/hero-02-md.webp"
+                 srcset="img/hero-02-sm.webp 800w, img/hero-02-md.webp 1400w, img/hero-02.webp 2400w"
+                 sizes="100vw" alt="Dino Duck na grama, entre folhas baixas"
+                 width="2400" height="1340" fetchpriority="high" decoding="async">
+          </figure>
+          <figure class="hero__slide" role="group"
+                  aria-roledescription="slide" aria-label="2 de 3: Xerife Duck na mesa">
+            <img src="img/hero-03-md.webp"
+                 srcset="img/hero-03-sm.webp 800w, img/hero-03-md.webp 1400w, img/hero-03.webp 2400w"
+                 sizes="100vw" alt="Xerife Duck sobre uma mesa de madeira, com a cidade ao fundo"
+                 width="2400" height="1340" loading="lazy" decoding="async">
+          </figure>
+          <figure class="hero__slide" role="group"
+                  aria-roledescription="slide" aria-label="3 de 3: Cyber Duck no setup">
+            <img src="img/hero-04-md.webp"
+                 srcset="img/hero-04-sm.webp 800w, img/hero-04-md.webp 1400w, img/hero-04.webp 2400w"
+                 sizes="100vw" alt="Cyber Duck ao lado de um teclado, sobre a mesa de trabalho"
+                 width="2400" height="1340" loading="lazy" decoding="async">
+          </figure>
+        </div>
+
+        <div class="hero__scrim" aria-hidden="true"></div>
+
+        <!-- Único controle do hero. São botões de verdade, com nome acessível
+             e estado (aria-current) casando com o visual. -->
+        <div class="hero__dots" id="heroDots" role="group" aria-label="Escolher foto"></div>
+      </section>
+
+      <!-- aria-hidden: o texto é duplicado para o loop; o leitor de tela leria tudo duas vezes -->
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track" id="marquee"></div>
+      </div>
+
+      <section class="section" id="colecao" aria-label="Coleção">
+        <div class="shell">
+          <div class="catalog-tools">
+            <label for="priceLimit">Preço inicial
+              <select id="priceLimit">
+                <option value="0">Todos os preços</option>
+                <option value="10000">Até R$ 100</option>
+                <option value="11000">Até R$ 110</option>
+                <option value="12000">Até R$ 120</option>
+              </select>
+            </label>
+            <button type="button" class="chip" id="favoritesOnly" aria-pressed="false">♡ Meus favoritos <span id="favoriteCount">0</span></button>
+            <button type="button" class="text-action" id="resetCatalog">Limpar filtros</button>
+
+            <div class="sort">
+              <label for="sort">Ordenar</label>
+              <select id="sort">
+                <option value="rel">Destaques da coleção</option>
+                <option value="asc">Menor preço</option>
+                <option value="desc">Maior preço</option>
+                <option value="az">Nome (A–Z)</option>
+              </select>
+            </div>
+
+            <!-- A contagem deixa de aparecer, mas continua sendo anunciada:
+                 é o que avisa quem usa leitor de tela que a grade mudou. -->
+            <p class="sr-only" id="resultCount" role="status"></p>
+          </div>
+          <ul class="grid" id="grid"></ul>
+        </div>
+      </section>
+
+      <section class="section" id="encomenda" aria-labelledby="encomendaTitle">
+        <div class="shell">
+          <div class="custom reveal">
+            <div class="custom__text">
+              <p class="eyebrow">Sob encomenda</p>
+              <h2 id="encomendaTitle">Um pato com a cara do seu time</h2>
+              <p>Uniforme, crachá, capacete, mascote de empresa. A gente modela, manda o render para sua aprovação e só depois imprime. Lotes a partir de 10 unidades, prazo médio de 3 semanas.</p>
+
+              <form class="brief" id="briefForm" novalidate>
+                <div class="brief__field">
+                  <label class="sr-only" for="briefEmail">Seu e-mail</label>
+                  <input id="briefEmail" type="email" inputmode="email" autocomplete="email" placeholder="seu@email.com" aria-describedby="briefEmailErr briefHint">
+                  <span class="field-error" id="briefEmailErr" role="alert"></span>
+                </div>
+                <button class="btn btn--primary" type="submit">Pedir orçamento</button>
+              </form>
+              <p class="fine-print" id="briefHint">Respondemos em até 2 dias úteis com faixa de preço e prazo.</p>
+            </div>
+
+            <div class="custom__art">
+              <img src="img/cow.webp" alt="Cow Duck, de pijama de vaca" width="1200" height="1200" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================== PRODUTO ==================== -->
+    <div id="viewProduct" hidden>
+      <div class="shell" id="pdp"></div>
+    </div>
+<section class="section section--tinted" id="sizeGuide"><div class="shell"><p class="eyebrow">Encontre seu tamanho</p><h2>Um lugar na mesa. Ou na estante.</h2><div class="size-guide"><article><span class="size-guide__number">6,5 <small>cm</small></span><h3>Mini</h3><p>Uma pequena companhia para a mesa e para começar sua coleção.</p></article><article><span class="size-guide__number">10 <small>cm</small></span><h3>Grande</h3><p>Mais presença para deixar os detalhes do personagem em destaque.</p></article></div><p class="fine-print">Alturas previstas no catálogo. Escolha o tamanho na página de cada personagem.</p></div></section>
+<section class="section" id="recentSection" hidden><div class="shell"><div class="section__head"><div><p class="eyebrow">Continue explorando</p><h2>Você viu por aqui</h2></div><button type="button" class="text-action" id="clearRecent">Limpar histórico</button></div><ul class="grid" id="recentGrid"></ul></div></section>
+<section class="section section--tinted" id="ajuda"><div class="shell help-layout"><div><p class="eyebrow">Antes de escolher</p><h2>Bom saber.</h2><p>Tamanhos, cuidados e como funciona esta loja de demonstração.</p></div><div class="faq">
+<details id="entrega"><summary>Como funcionam o frete e a entrega?</summary><p>O checkout usa um frete de demonstração de R$ 24,90, grátis a partir de R$ 250 em produtos após o cupom. Ainda não há consulta por CEP nem prazo de entrega confirmado. Nenhum pedido é enviado nesta versão.</p></details>
+<details id="trocas"><summary>Como solicitar uma troca?</summary><p>Esta versão não realiza vendas. Os canais de atendimento e a política de trocas serão definidos antes da abertura da loja.</p></details>
+<details id="cuidados"><summary>Como cuidar do meu colecionável?</summary><p>As peças do catálogo são de PLA. Limpe suavemente com pano seco e mantenha longe de calor, sol direto e produtos abrasivos. Evite quedas e pressão nos detalhes.</p></details>
+<details><summary>O que vem na minha seleção?</summary><p>Cada item corresponde a um personagem no tamanho escolhido: Mini, de 6,5 cm, ou Grande, de 10 cm. Confira tamanho e quantidade na sacola antes de continuar.</p></details>
+<details><summary>Já posso comprar de verdade?</summary><p>Ainda não. Preços, cupons e formas de pagamento fazem parte da demonstração. O checkout não cobra, não reserva estoque e não cria um pedido real.</p></details>
+<details id="privacidade"><summary>Onde ficam meus favoritos e histórico?</summary><p>Favoritos, produtos vistos e sacola ficam salvos neste navegador, sem criar uma conta. Você pode limpar o histórico no botão correspondente e remover os favoritos pelos corações. O formulário de orçamento não envia seus dados.</p></details>
+</div></div></section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell">
+      <div class="footer__grid">
+        <div>
+          <a href="#/" class="logo" style="width:max-content" aria-label="Duck Dodgers, ir para a página inicial">
+            <img src="img/logo.webp" alt="" width="560" height="290" loading="lazy">
+          </a>
+          <p class="footer__about">Patos colecionáveis com personalidade de sobra. Escolha o seu e dê início à turma.</p>
+
+          <form class="signup" id="signupForm" novalidate>
+            <label for="signupEmail">Receba lançamentos e ações exclusivas</label>
+            <div class="signup__field">
+              <input id="signupEmail" type="email" autocomplete="email"
+                     placeholder="seu@email.com" aria-describedby="signupHint signupError">
+              <button type="submit" class="btn btn--accent">Assinar</button>
+            </div>
+            <p class="field-error" id="signupError" role="alert"></p>
+            <p class="signup__hint" id="signupHint">Protótipo: nada é enviado e nenhum cadastro é feito.</p>
+          </form>
+
+          <ul class="social" aria-label="Redes sociais">
+            <li>
+              <a href="https://www.instagram.com/duckthedodgers/" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/></svg>
+                <span>Instagram</span>
+                <span class="sr-only">(abre em uma nova aba)</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <nav aria-labelledby="footLoja">
+          <h2 id="footLoja">Loja</h2>
+          <ul>
+            <li><a href="#colecao">Coleção 01</a></li>
+            <li><a href="#encomenda">Sob encomenda</a></li>
+          </ul>
+        </nav>
+
+        <nav aria-labelledby="footAjuda">
+          <h2 id="footAjuda">Ajuda</h2>
+          <ul>
+            <li><a href="#entrega">Prazo de entrega</a></li>
+            <li><a href="#trocas">Trocas e devoluções</a></li>
+            <li><a href="#cuidados">Cuidados com a peça</a></li><li><a href="#privacidade">Privacidade</a></li>
+          </ul>
+        </nav>
+
+        <div>
+          <h2 id="footContato">Contato</h2>
+          <ul aria-labelledby="footContato">
+            <li><a href="mailto:oi@duckdodgers.com.br">oi@duckdodgers.com.br</a></li>
+            <li>Seg a sex, 10h–18h</li>
+            <li>São Paulo, SP</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer__pay">
+        <h2 id="footPay">Formas de pagamento</h2>
+        <ul class="flags" aria-labelledby="footPay">
+          <li><span class="flag" role="img" aria-label="Pix"><svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" fill="#32BCAD"><path d="M12 1.6 8.9 4.7h1.5c.6 0 1.2.2 1.6.7l3.2 3.2c.3.3.7.3 1 0l3.2-3.2c.4-.4 1-.7 1.6-.7h.4L18.3 1.6a4.4 4.4 0 0 0-6.3 0z"/><path d="M22.4 8.2 20 5.8h-1a2 2 0 0 0-1.4.6l-3.2 3.2c-.7.7-1.9.7-2.6 0L8.6 6.4A2 2 0 0 0 7.2 5.8H5.7L3.3 8.2a4.4 4.4 0 0 0 0 6.3l2.4 2.4h1.5c.5 0 1-.2 1.4-.6l3.2-3.2c.7-.7 1.9-.7 2.6 0l3.2 3.2c.4.4.9.6 1.4.6h1l2.4-2.4a4.4 4.4 0 0 0 0-6.3z"/><path d="M15.2 15.4c-.3-.3-.7-.3-1 0l-3.2 3.2c-.4.4-1 .7-1.6.7H8.9l3.1 3.1a4.4 4.4 0 0 0 6.3 0l3.1-3.1h-.4c-.6 0-1.2-.3-1.6-.7z"/></svg></span></li>
+          <li><span class="flag" role="img" aria-label="Visa"><b>VISA</b></span></li>
+          <li><span class="flag" role="img" aria-label="Mastercard"><svg width="30" height="19" viewBox="0 0 30 19" aria-hidden="true"><circle cx="11.5" cy="9.5" r="7" fill="#EB001B"/><circle cx="18.5" cy="9.5" r="7" fill="#F79E1B"/><path d="M15 4.2a7 7 0 0 0 0 10.6 7 7 0 0 0 0-10.6z" fill="#FF5F00"/></svg></span></li>
+          <li><span class="flag" role="img" aria-label="Elo"><b>elo</b></span></li>
+          <li><span class="flag" role="img" aria-label="American Express"><b>AMEX</b></span></li>
+          <li><span class="flag" role="img" aria-label="Boleto bancário"><svg width="24" height="15" viewBox="0 0 24 15" aria-hidden="true" fill="currentColor"><rect x="1" y="1" width="1.6" height="13"/><rect x="4" y="1" width="1" height="13"/><rect x="6.4" y="1" width="2" height="13"/><rect x="10" y="1" width="1" height="13"/><rect x="12.6" y="1" width="1.6" height="13"/><rect x="15.8" y="1" width="1" height="13"/><rect x="18.2" y="1" width="2.2" height="13"/><rect x="21.8" y="1" width="1" height="13"/></svg></span></li>
+        </ul>
+      </div>
+
+      <div class="footer__bottom">
+        <span>© 2026 Duck Dodgers® &middot; protótipo de loja</span>
+        <span class="mono">São Paulo, SP &middot; Brasil</span>
+      </div>
+    </div>
+  </footer>
+</div><!-- /#appRoot -->
+
+<!-- ==================== OVERLAYS ==================== -->
+
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true" hidden>
+  <div class="mobile-menu__head">
+    <span class="logo"><img src="img/logo.webp" alt="Duck Dodgers" width="560" height="290"></span>
+    <button type="button" class="icon-btn" id="closeMenu" aria-label="Fechar menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+
+  <nav aria-label="Principal, móvel">
+    <a href="#colecao">Coleção</a>
+    <a href="#encomenda">Sob encomenda</a>
+  </nav>
+
+  <p class="mobile-menu__foot">
+    <a href="mailto:oi@duckdodgers.com.br">oi@duckdodgers.com.br</a><br>
+    Seg a sex, 10h–18h &middot; São Paulo, SP
+  </p>
+</div>
+
+<!-- Entrar: so os provedores e o e-mail. Sem campo de senha de proposito —
+     num prototipo, pedir senha e pedir um dado real sem ter onde guardar. -->
+<div class="modal auth" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-hidden="true" hidden>
+  <div class="modal__scrim" data-auth-close></div>
+  <div class="modal__card auth__card">
+    <button type="button" class="icon-btn auth__close" id="authClose" aria-label="Fechar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+
+    <p class="eyebrow">Sua conta</p>
+    <h2 id="authTitle">Entrar ou criar conta</h2>
+    <p class="auth__sub">Para guardar seus favoritos e acompanhar pedidos.</p>
+
+    <button type="button" class="auth__sso" data-sso="Google">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.7-2 5-4.4 6.6v5.5h7.1c4.1-3.8 6.6-9.4 6.6-16.1z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.5 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.2c-.4-1.3-.7-2.7-.7-4.2s.2-2.9.7-4.2v-5.7H4.5A22 22 0 0 0 2 24c0 3.6.9 6.9 2.5 9.9l7.3-5.7z"/><path fill="#EA4335" d="M24 10.4c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 3.9 29.9 2 24 2 15.5 2 8.1 6.9 4.5 14.1l7.3 5.7c1.7-5.2 6.5-9.4 12.2-9.4z"/></svg>
+      Continuar com Google
+    </button>
+
+    <button type="button" class="auth__sso" data-sso="Apple">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.8c0-2.4 2-3.5 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.1-.8-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.5.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.1.7 1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7 0 0-2.5-.9-2.5-3.8zM14 5.6c.7-.8 1.1-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4z"/></svg>
+      Continuar com Apple
+    </button>
+
+    <p class="auth__or"><span>ou</span></p>
+
+    <form id="authForm" novalidate>
+      <label for="authEmail">E-mail</label>
+      <div class="auth__field">
+        <input id="authEmail" type="email" autocomplete="email" placeholder="seu@email.com" aria-describedby="authError">
+        <button type="submit" class="btn btn--accent">Continuar →</button>
+      </div>
+      <p class="field-error" id="authError" role="alert"></p>
+    </form>
+
+    <p class="fine-print">Protótipo: nenhuma conta é criada e nada é enviado. O que você digitar aqui não sai deste navegador.</p>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
+  <div class="drawer__head">
+    <h2 id="drawerTitle">Sua sacola</h2>
+    <button type="button" class="icon-btn" id="closeCart" aria-label="Fechar sacola">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="ship-bar" id="shipBar"></div>
+  <ul class="cart-list" id="cartList"></ul>
+  <div class="drawer__foot" id="drawerFoot"></div>
+</aside>
+
+<p class="sr-only" id="cartLive" role="status"></p>
+<p class="toast" id="toast" role="status"></p>
+
+<noscript>
+  <p style="padding:24px;text-align:center">
+    Este protótipo precisa de JavaScript para mostrar o catálogo, a sacola e o checkout.
+  </p>
+</noscript>
+
+</body>
+</html>

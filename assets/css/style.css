@@ -205,7 +205,8 @@ p { text-wrap: pretty; }
               border-color var(--t-base) var(--ease),
               box-shadow var(--t-base) var(--ease);
 }
-.header.is-stuck {
+.header.is-stuck,
+.header.is-search {
   background: color-mix(in srgb, var(--ground) 86%, transparent);
   backdrop-filter: blur(14px) saturate(1.4);
   border-bottom-color: var(--line);
@@ -213,20 +214,11 @@ p { text-wrap: pretty; }
 }
 /* Enquanto flutua, o cabecalho esta sobre a cena noturna do video: tudo
    nele inverte para claro. Ao virar barra solida, volta ao normal. */
-.header:not(.is-stuck) { color: #FCFAF2; }
-.header:not(.is-stuck) .nav a { color: rgb(252 250 242 / .84); }
-.header:not(.is-stuck) .nav a:hover { color: #FFFFFF; }
-.header:not(.is-stuck) .icon-btn { color: rgb(252 250 242 / .88); }
-.header:not(.is-stuck) .icon-btn:hover { background: rgb(252 250 242 / .16); color: #FFFFFF; }
-.header:not(.is-stuck) .search {
-  background: rgb(252 250 242 / .12);
-  border-color: rgb(252 250 242 / .26);
-  backdrop-filter: blur(8px);
-}
-.header:not(.is-stuck) .search svg { color: rgb(252 250 242 / .70); }
-.header:not(.is-stuck) .search input { color: #FCFAF2; }
-.header:not(.is-stuck) .search input::placeholder { color: rgb(252 250 242 / .62); }
-
+.header:not(.is-stuck):not(.is-search) { color: #FCFAF2; }
+.header:not(.is-stuck):not(.is-search) .nav a { color: rgb(252 250 242 / .84); }
+.header:not(.is-stuck):not(.is-search) .nav a:hover { color: #FFFFFF; }
+.header:not(.is-stuck):not(.is-search) .icon-btn { color: rgb(252 250 242 / .88); }
+.header:not(.is-stuck):not(.is-search) .icon-btn:hover { background: rgb(252 250 242 / .16); color: #FFFFFF; }
 .header__in { display: flex; align-items: center; gap: var(--sp-5); height: var(--header-h); }
 
 .logo { display: block; background: var(--brand); border-radius: 10px; padding: 7px 12px; flex: none; }
@@ -245,16 +237,38 @@ p { text-wrap: pretty; }
 
 .header__right { margin-left: auto; display: flex; align-items: center; gap: var(--sp-1); }
 
-.search {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--surface); border: 1.5px solid var(--line);
-  border-radius: var(--r-md); padding: 0 12px; height: 42px;
-  transition: border-color var(--t-fast) var(--ease);
+/* Barra de busca — desce de dentro do cabecalho quando o icone e acionado.
+   Ela nao escurece a pagina: o resultado aparece na grade logo abaixo. */
+.searchbar {
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  animation: searchbar-in var(--t-base) var(--ease);
 }
-.search:focus-within { border-color: var(--ink); }
-.search svg { flex: none; color: var(--ink-3); }
-.search input { border: 0; background: none; outline: none; width: 100%; min-width: 0; font-size: 14px; }
-.search input::placeholder { color: var(--ink-3); }
+@keyframes searchbar-in { from { opacity: 0; transform: translateY(-8px); } }
+
+.searchbar__in {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding-top: var(--sp-3); padding-bottom: var(--sp-3);
+}
+.searchbar__field {
+  flex: 1; display: flex; align-items: center; gap: var(--sp-3);
+  min-height: 52px; padding: 0 var(--sp-4);
+  border: 1.5px solid var(--line-strong); border-radius: var(--r-full);
+  background: var(--ground);
+}
+.searchbar__field:focus-within { border-color: var(--ink); }
+.searchbar__field svg { flex: none; color: var(--ink-3); }
+.searchbar__field input {
+  width: 100%; min-width: 0; border: 0; background: none; outline: none;
+  font-family: var(--font-body); font-size: 16px; color: var(--ink);
+}
+.searchbar__field input::placeholder { color: var(--ink-3); }
+/* o X nativo do type=search duplicaria o botao de fechar */
+.searchbar__field input::-webkit-search-cancel-button { display: none; }
+
+
+@media (prefers-reduced-motion: reduce) { .searchbar { animation: none; } }
+
 .header .search { width: 210px; }
 
 .cart-btn { position: relative; }
@@ -291,131 +305,86 @@ p { text-wrap: pretty; }
   font-family: var(--font-display); font-size: clamp(26px, 8vw, 34px); font-weight: 700;
   padding: var(--sp-3) 0; border-bottom: 1px solid var(--line);
 }
-.mobile-menu .search { height: 50px; }
 .mobile-menu__foot { margin: auto 0 0; font-size: 14px; color: var(--ink-2); }
 .mobile-menu__foot a { text-decoration: underline; text-underline-offset: 3px; }
 
 /* --------------------------------------------------------------------------
    5. Hero
    -------------------------------------------------------------------------- */
-/* A margem negativa puxa o hero para debaixo do cabecalho sticky: o video
-   comeca no topo da pagina e o menu flutua sobre ele. */
+/* --------------------------------------------------------------------------
+   5b. Hero — carrossel de imagens
+   Sem texto e sem vídeo: a única interface é a fileira de dots. A margem
+   negativa puxa o hero para debaixo do cabeçalho sticky, então a foto começa
+   no topo da página e o menu flutua sobre ela.
+   -------------------------------------------------------------------------- */
 .hero {
   position: relative; isolation: isolate; overflow: hidden;
   margin-top: calc(-1 * var(--header-h));
-  padding-top: var(--header-h);
+  height: clamp(420px, 60vh, 780px);
+  background: var(--ground-2);
   border-bottom: 1px solid var(--line);
 }
 
-.hero__media { position: absolute; inset: 0; z-index: -2; background: var(--ground-2); }
-/* O video instalado tem o pato no centro; o corte e ancorado um pouco
-   acima do meio para a cabeca dele nunca sair em telas largas. */
-.hero__video { width: 100%; height: 100%; object-fit: cover; object-position: center 32%; }
+.hero__viewport { position: absolute; inset: 0; }
 
-/* Veu escuro. Um veu na cor creme sobre uma cena noturna vira lama e mata o
-   neon; escurecendo, o texto claro ganha contraste e o video segue vivo.
-   Forte a esquerda (onde fica o texto), leve a direita (onde esta o pato). */
-.hero__veil {
-  position: absolute; inset: 0;
+/* Troca por fade: sem deslocamento horizontal não há risco de a página
+   ganhar barra de rolagem lateral, e o corte das fotos não muda. */
+.hero__slide {
+  position: absolute; inset: 0; margin: 0;
+  opacity: 0; visibility: hidden;
+  transition: opacity 700ms var(--ease), visibility 0s linear 700ms;
+}
+.hero__slide.is-active {
+  opacity: 1; visibility: visible;
+  transition: opacity 700ms var(--ease), visibility 0s;
+}
+.hero__slide img { width: 100%; height: 100%; object-fit: cover; object-position: center 58%; }
+
+/* Escurece só as bordas: o topo segura o cabeçalho claro flutuando e a base
+   segura os dots. O miolo da foto fica limpo.
+   Medido nas três fotos: com o degradê mais fraco que isto, o menu caía para
+   3,96:1 sobre a foto da mesa clara. */
+.hero__scrim {
+  position: absolute; inset: 0; pointer-events: none;
   background:
-    linear-gradient(to bottom,
-      rgb(9 7 18 / .80) 0%, rgb(9 7 18 / .20) 24%,
-      rgb(9 7 18 / .04) 42%, rgb(9 7 18 / .52) 100%),
-    linear-gradient(100deg,
-      rgb(9 7 18 / .92) 0%,
-      rgb(9 7 18 / .86) 26%,
-      rgb(9 7 18 / .58) 45%,
-      rgb(9 7 18 / .30) 62%,
-      rgb(9 7 18 / .22) 100%);
+    linear-gradient(to bottom, rgb(9 7 18 / .76) 0%, rgb(9 7 18 / .30) 16%, rgb(9 7 18 / 0) 34%),
+    linear-gradient(to top, rgb(9 7 18 / .64) 0%, rgb(9 7 18 / .10) 18%, rgb(9 7 18 / 0) 32%);
 }
 
-/* Texto claro apenas no layout em que ele cobre o video. No empilhado
-   (<=900px) o texto desce para o fundo claro e volta a ser escuro, por isso
-   estes tokens ficam presos ao min-width. */
-@media (min-width: 901px) {
-  .hero {
-    --ink:         #FCFAF2;
-    --ink-2:       #DAD4C6;
-    --ink-3:       #ADA799;
-    --line:        rgb(252 250 242 / .20);
-    --line-strong: rgb(252 250 242 / .34);
-    color: var(--ink);
-  }
-  /* o botao primario usa var(--ink) como fundo: no escuro viraria claro sobre
-     claro, entao no hero ele passa a ser o ambar da marca */
-  .hero .btn--primary { background: var(--brand); color: var(--brand-ink); }
-  .hero .btn--primary:hover { background: #FFFFFF; color: #201E19; }
-  .hero .btn--ghost { border-color: rgb(252 250 242 / .46); color: #FCFAF2; }
-  .hero .btn--ghost:hover { background: rgb(252 250 242 / .14); border-color: #FCFAF2; }
+.hero__dots {
+  position: absolute; z-index: 2;
+  left: 50%; transform: translateX(-50%);
+  bottom: clamp(18px, 3vh, 34px);
+  display: flex; gap: 10px;
 }
 
-.hero__in {
-  position: relative;
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .82fr);
-  gap: var(--sp-7); align-items: center;
-  padding-block: var(--sp-8) var(--sp-7);
-  /* Altura previsivel: e ela que define quanto do video 16:9 sobra depois do
-     corte. Com 820 px de teto, numa tela de 2560 px fica visivel a faixa
-     central de ~57% da altura do video; num ultrawide de 3440 px, ~42%.
-     Dai a zona segura documentada em assets/video/LEIAME.md. */
-  min-height: clamp(540px, 62vh, 820px);
+/* Alvo de toque de 28 px com um ponto de 9 px desenhado dentro: o alvo
+   cumpre o mínimo sem engordar o visual. */
+.hero__dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: none; border: 0;
 }
-
-
-.hero h1 { font-size: clamp(42px, 7vw, 76px); font-weight: 800; margin-top: var(--sp-4); }
-.hero h1 em { font-style: normal; color: var(--accent); }
-.hero .mark {
-  background-image: linear-gradient(transparent 62%, color-mix(in srgb, var(--brand) 85%, transparent) 0);
-  background-repeat: no-repeat;
+.hero__dot::before {
+  content: ""; width: 9px; height: 9px; border-radius: 50%;
+  background: rgb(252 250 242 / .78);
+  box-shadow: 0 1px 4px rgb(0 0 0 / .6);
+  transition: width var(--t-base) var(--ease), background var(--t-base) var(--ease);
 }
-
-.hero__lede { font-size: 17.5px; color: var(--ink-2); max-width: 46ch; margin: var(--sp-5) 0 0; }
-.hero__cta { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
-
-.hero__stats {
-  display: flex; gap: var(--sp-6); flex-wrap: wrap;
-  margin: var(--sp-7) 0 0; padding-top: var(--sp-5);
-  border-top: 1px solid var(--line);
-  list-style: none;
+.hero__dot:hover::before { background: rgb(252 250 242 / .82); }
+.hero__dot[aria-current="true"]::before {
+  width: 30px; border-radius: var(--r-full);
+  background: var(--brand);
 }
-.hero__stats li { display: flex; flex-direction: column; }
-.hero__stats b { font-family: var(--font-display); font-size: 24px; font-weight: 700; }
-.hero__stats span { font-size: 12.5px; color: var(--ink-3); }
+.hero__dot:focus-visible { outline: 3px solid #FCFAF2; outline-offset: 0; }
 
-/* uma unica entrada coreografada no carregamento */
-@keyframes rise { from { opacity: 0; transform: translateY(20px); } }
-.js-ready .hero__in > div > * { animation: rise .62s var(--ease) backwards; }
-.js-ready .hero__in > div > *:nth-child(1) { animation-delay: .06s; }
-.js-ready .hero__in > div > *:nth-child(2) { animation-delay: .14s; }
-.js-ready .hero__in > div > *:nth-child(3) { animation-delay: .22s; }
-.js-ready .hero__in > div > *:nth-child(4) { animation-delay: .30s; }
-.js-ready .hero__in > div > *:nth-child(5) { animation-delay: .38s; }
-
-/* Empilhado, o corte diagonal nao funciona. Esticar o video sobre o hero
-   inteiro tambem nao: como o hero fica alto, `cover` joga a cena para fora
-   do enquadramento e o veu cobre tudo. Entao no mobile o video vira uma
-   faixa de altura fixa no topo e o texto desce para o fundo solido. */
 @media (max-width: 900px) {
-  .hero__media { inset: 0 0 auto 0; height: min(50vh, 400px); }
-  /* Nesta faixa o video nao perde altura, so largura: fica a fatia central,
-     que e onde esta o pato. */
-  .hero__video { object-position: center center; }
-  /* Escurece o topo para o cabecalho flutuante e derrete a base da faixa no
-     fundo claro da pagina, onde o texto recomeca. */
-  .hero__veil {
-    background:
-      linear-gradient(to bottom, rgb(9 7 18 / .74) 0%, rgb(9 7 18 / .12) 26%),
-      linear-gradient(to top,
-        var(--ground) 0%,
-        color-mix(in srgb, var(--ground) 86%, transparent) 9%,
-        rgb(9 7 18 / 0) 34%);
-  }
-  .hero__in {
-    grid-template-columns: 1fr; gap: var(--sp-5);
-    padding-block: calc(min(50vh, 400px) - var(--header-h) - var(--sp-2)) var(--sp-6);
-    min-height: 0;
-  }
-  .hero__stats { gap: var(--sp-5); margin-top: var(--sp-6); }
+  .hero { height: clamp(380px, 52vh, 540px); }
+  .hero__slide img { object-position: center 55%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__slide { transition: none; }
 }
 
 /* --------------------------------------------------------------------------
@@ -452,30 +421,32 @@ p { text-wrap: pretty; }
 /* --------------------------------------------------------------------------
    8. Filtros
    -------------------------------------------------------------------------- */
-.filters { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: center; margin-bottom: var(--sp-5); }
-.filters__group { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
-
+/* A base .chip continua servindo o botão "Meus favoritos"; o que saiu foi o
+   grupo de rádio de categorias, que deixou de existir. */
 .chip {
   min-height: 40px; padding: 0 16px;
   border-radius: var(--r-full);
   border: 1.5px solid var(--line-strong);
   background: var(--surface);
   font-size: 13.5px; font-weight: 500; color: var(--ink-2);
-  display: inline-flex; align-items: center;
+  display: inline-flex; align-items: center; gap: 6px;
   transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
               border-color var(--t-fast) var(--ease);
 }
 .chip:hover { border-color: var(--ink-3); color: var(--ink); }
-.chip[aria-checked="true"] { background: var(--ink); border-color: var(--ink); color: var(--ground); }
 
+/* "Ordenar" agora vive dentro da barra de filtros, empurrado para a direita. */
 .sort { margin-left: auto; display: flex; align-items: center; gap: var(--sp-2); }
-.sort label { font-size: 12.5px; color: var(--ink-3); white-space: nowrap; }
+.sort label { font-size: 14px; color: var(--ink-2); white-space: nowrap; }
 .sort select {
   min-height: 40px; border-radius: var(--r-full);
   border: 1.5px solid var(--line-strong); background: var(--surface);
   padding: 0 14px; font-size: 13.5px;
 }
-@media (max-width: 680px) { .sort { margin-left: 0; width: 100%; } .sort select { flex: 1; } }
+@media (max-width: 680px) {
+  .sort { margin-left: 0; width: 100%; }
+  .sort select { flex: 1; }
+}
 
 /* --------------------------------------------------------------------------
    9. Grade de produtos
@@ -497,15 +468,19 @@ p { text-wrap: pretty; }
 }
 .card:hover { border-color: var(--line-strong); transform: translateY(-5px); box-shadow: var(--shadow-lg); }
 
+/* As fotos são opacas e já trazem o próprio fundo de estúdio, então
+   sangram na moldura. O degradê âmbar e o drop-shadow saíram: sobre uma
+   foto quadrada eles viravam um retângulo flutuando. */
 .card__media {
-  position: relative; aspect-ratio: 1; padding: var(--sp-4);
-  display: grid; place-items: center;
-  background:
-    radial-gradient(66% 58% at 50% 42%, color-mix(in srgb, var(--brand) 22%, transparent), transparent 72%),
-    var(--surface-2);
+  position: relative; aspect-ratio: 1; overflow: hidden;
+  background: var(--surface-2);
 }
-.card__media img { width: 88%; filter: var(--drop); transition: transform var(--t-slow) var(--ease-back); }
-.card:hover .card__media img { transform: scale(1.07) rotate(-2deg); }
+.card__media img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform var(--t-slow) var(--ease-back);
+}
+/* sem rotação: ela mostraria os cantos da foto */
+.card:hover .card__media img { transform: scale(1.05); }
 
 .card__tag {
   position: absolute; top: var(--sp-3); left: var(--sp-3);
@@ -561,25 +536,13 @@ p { text-wrap: pretty; }
 }
 @media (max-width: 900px) { .pdp { grid-template-columns: 1fr; gap: var(--sp-5); } }
 
-.gallery__main {
-  aspect-ratio: 1; padding: var(--sp-6);
+.gallery {
+  margin: 0; aspect-ratio: 1; overflow: hidden;
   border: 1px solid var(--line); border-radius: var(--r-xl);
-  display: grid; place-items: center;
-  background:
-    radial-gradient(66% 58% at 50% 42%, color-mix(in srgb, var(--brand) 26%, transparent), transparent 72%),
-    var(--surface-2);
+  background: var(--surface-2);
 }
-.gallery__main img { width: 84%; filter: var(--drop-lg); }
+.gallery img { width: 100%; height: 100%; object-fit: cover; }
 
-.gallery__thumbs { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--sp-2); margin-top: var(--sp-2); }
-.thumb {
-  aspect-ratio: 1; padding: 6px;
-  border: 1.5px solid var(--line); border-radius: var(--r-md);
-  background: var(--surface-2); display: grid; place-items: center;
-  transition: border-color var(--t-fast) var(--ease);
-}
-.thumb:hover { border-color: var(--line-strong); }
-.thumb[aria-checked="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
 
 .pdp h1 { font-size: clamp(32px, 4.6vw, 48px); font-weight: 800; margin-top: var(--sp-3); }
 .pdp__lede { color: var(--ink-2); margin: var(--sp-4) 0 0; font-size: 16px; }
@@ -643,30 +606,6 @@ ul.perks { list-style: none; display: flex; gap: var(--sp-4); flex-wrap: wrap; m
 .specs dl > :nth-last-child(-n+2) { border-bottom: 0; }
 
 /* --------------------------------------------------------------------------
-   11. Processo
-   -------------------------------------------------------------------------- */
-.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-5); list-style: none; margin: 0; padding: 0; }
-@media (max-width: 880px) { .steps { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 500px) { .steps { grid-template-columns: 1fr; } }
-
-.step { border-top: 2px solid var(--ink); padding-top: var(--sp-4); }
-.step__n { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); letter-spacing: .12em; }
-.step h3 { font-size: 18px; font-weight: 700; margin: var(--sp-2) 0; }
-.step p { margin: 0; font-size: 14px; color: var(--ink-2); }
-
-.facts {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 1px; background: var(--line);
-  border: 1px solid var(--line); border-radius: var(--r-lg);
-  overflow: hidden; margin: var(--sp-7) 0 0;
-  list-style: none; padding: 0;
-}
-@media (max-width: 700px) { .facts { grid-template-columns: repeat(2, 1fr); } }
-.facts li { background: var(--ground); padding: var(--sp-5) var(--sp-4); }
-.facts b { display: block; font-family: var(--font-display); font-size: 24px; font-weight: 700; }
-.facts span { font-size: 12.5px; color: var(--ink-3); }
-
-/* --------------------------------------------------------------------------
    12. Sob encomenda
    -------------------------------------------------------------------------- */
 .custom {
@@ -691,7 +630,10 @@ ul.perks { list-style: none; display: flex; gap: var(--sp-4); flex-wrap: wrap; m
 .field-error { display: block; font-size: 12.5px; color: var(--danger); margin-top: 6px; }
 
 .custom__art { display: flex; justify-content: center; }
-.custom__art img { width: 70%; filter: var(--drop-lg); }
+.custom__art img {
+  width: min(100%, 380px); aspect-ratio: 1; object-fit: cover;
+  border-radius: var(--r-xl); box-shadow: var(--shadow-md);
+}
 
 .form-ok {
   margin: var(--sp-5) 0 0; padding: var(--sp-4);
@@ -704,7 +646,17 @@ ul.perks { list-style: none; display: flex; gap: var(--sp-4); flex-wrap: wrap; m
    -------------------------------------------------------------------------- */
 .footer { border-top: 1px solid var(--line); background: var(--surface); padding-block: var(--sp-7) var(--sp-6); }
 .footer__grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: var(--sp-6); }
-@media (max-width: 780px) { .footer__grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 780px) {
+  .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* a coluna da marca leva logo, texto, assinatura e Instagram: em duas
+     colunas estreitas ela ficaria espremida */
+  .footer__grid > div:first-child { grid-column: 1 / -1; }
+  .signup { max-width: none; }
+}
+@media (max-width: 420px) {
+  .signup__field { flex-wrap: wrap; }
+  .signup__field .btn { width: 100%; }
+}
 .footer h2 {
   margin: 0 0 var(--sp-3); font-family: var(--font-mono); font-size: 11px; font-weight: 500;
   letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3);
@@ -715,6 +667,50 @@ ul.perks { list-style: none; display: flex; gap: var(--sp-4); flex-wrap: wrap; m
 .footer a { display: inline-flex; align-items: center; min-height: 26px; }
 .footer a:hover { color: var(--ink); }
 .footer__about { font-size: 13.5px; color: var(--ink-2); max-width: 34ch; margin: var(--sp-4) 0 0; }
+/* Assinatura ---------------------------------------------------------------
+   O rotulo fica visivel em vez de virar placeholder: placeholder some quando
+   a pessoa comeca a digitar, e ai o campo perde o nome. */
+.signup { margin: var(--sp-5) 0 0; max-width: 340px; }
+.signup label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: var(--sp-2); color: var(--ink-2); }
+.signup__field { display: flex; gap: var(--sp-2); }
+.signup__field input {
+  flex: 1; min-width: 0; min-height: 46px; padding: 0 14px;
+  border: 1.5px solid var(--line-strong); border-radius: var(--r-sm);
+  background: var(--ground); outline: none;
+  font-family: var(--font-body); font-size: 15px; color: var(--ink);
+}
+.signup__field input:focus { border-color: var(--ink); }
+.signup__field input[aria-invalid="true"] { border-color: var(--danger); }
+.signup__field input::placeholder { color: var(--ink-3); }
+.signup__field .btn { min-height: 46px; padding: 0 20px; white-space: nowrap; }
+.signup__hint { margin: var(--sp-2) 0 0; font-size: 12px; color: var(--ink-3); }
+.signup .field-error:empty { display: none; }
+
+/* Instagram ---------------------------------------------------------------- */
+.footer .social { list-style: none; margin: var(--sp-5) 0 0; padding: 0; display: flex; flex-direction: row; gap: var(--sp-3); }
+.social a {
+  display: inline-flex; align-items: center; gap: 9px;
+  min-height: 44px; padding: 0 16px 0 13px;
+  border: 1.5px solid var(--line-strong); border-radius: var(--r-full);
+  font-size: 14px; font-weight: 500; color: var(--ink-2);
+  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.social a:hover { border-color: var(--ink); color: var(--ink); }
+
+/* Bandeiras ----------------------------------------------------------------
+   Cada uma tem nome proprio (role=img + aria-label): sem isso a fileira seria
+   lida como um punhado de letras soltas, ou nem seria lida. */
+.footer__pay { margin-top: var(--sp-7); }
+.footer .flags { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: row; flex-wrap: wrap; gap: var(--sp-2); }
+.flags li { min-height: 0; }
+.flag {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 50px; height: 32px;
+  border: 1px solid var(--line); border-radius: 6px;
+  background: var(--ground); color: var(--ink-2);
+}
+.flag b { font-family: var(--font-display); font-size: 12px; font-weight: 800; letter-spacing: .02em; color: var(--ink); }
+
 .footer__bottom {
   display: flex; justify-content: space-between; gap: var(--sp-4); flex-wrap: wrap;
   margin-top: var(--sp-7); padding-top: var(--sp-5);
@@ -760,7 +756,8 @@ ul.perks { list-style: none; display: flex; gap: var(--sp-4); flex-wrap: wrap; m
   display: grid; grid-template-columns: 68px 1fr auto; gap: var(--sp-3);
   padding: var(--sp-4) 0; border-bottom: 1px solid var(--line); align-items: center;
 }
-.line__media { width: 68px; height: 68px; border-radius: var(--r-md); background: var(--surface-2); display: grid; place-items: center; padding: 5px; }
+.line__media { width: 68px; height: 68px; border-radius: var(--r-md); background: var(--surface-2); overflow: hidden; }
+.line__media img { width: 100%; height: 100%; object-fit: cover; }
 .line b { font-family: var(--font-display); font-size: 15px; font-weight: 700; display: block; }
 .line__meta { display: block; font-size: 12.5px; color: var(--ink-3); font-family: var(--font-mono); }
 .line__right { text-align: right; }
@@ -927,7 +924,6 @@ ul.perks { list-style: none; display: flex; gap: var(--sp-4); flex-wrap: wrap; m
   }
   .marquee__track { animation: none !important; transform: none !important; }
   .js-ready .reveal { opacity: 1 !important; transform: none !important; }
-  .js-ready .hero__in > div > * { animation: none !important; }
   .btn:hover, .card:hover, .card:hover .card__media img { transform: none; }
 }
 
@@ -935,7 +931,6 @@ ul.perks { list-style: none; display: flex; gap: var(--sp-4); flex-wrap: wrap; m
 .catalog-tools {display:flex; flex-wrap:wrap; align-items:center; gap:16px; margin:0 0 24px; padding:18px 0; border-block:1px solid var(--line)}
 .catalog-tools label {display:flex;align-items:center;gap:10px;font-size:14px}
 .catalog-tools select {background:var(--surface);border:1px solid var(--line-strong);padding:10px;border-radius:8px}
-.catalog-tools p {margin:0 0 0 auto;color:var(--ink-2);font-size:14px}
 .text-action {text-decoration:underline;text-underline-offset:4px;font-size:14px;min-height:44px;display:inline-flex;align-items:center}
 .chip[aria-pressed="true"] {background:var(--ink);color:var(--ground)}
 .favorite-btn {position:relative;z-index:3;display:grid;place-items:center;width:44px;height:44px;background:var(--surface);border:1px solid var(--line);border-radius:50%;font-size:27px;color:var(--ink)}
@@ -950,13 +945,43 @@ ul.perks { list-style: none; display: flex; gap: var(--sp-4); flex-wrap: wrap; m
 .faq details {border-bottom:1px solid var(--line-strong);padding:18px 0;scroll-margin-top:100px}
 .faq summary {cursor:pointer;font-weight:600;padding:5px 0}.faq p {color:var(--ink-2);padding:12px 0 4px;max-width:65ch}
 .product-extras {display:flex;align-items:center;flex-wrap:wrap;gap:24px;margin:24px 0}.related-grid {margin-top:24px;grid-template-columns:repeat(2,minmax(0,1fr))}
-@media(max-width:640px){.size-guide,.help-layout {grid-template-columns:1fr;gap:20px}.size-guide article{padding:24px}.catalog-tools{align-items:flex-start}.catalog-tools p{width:100%;margin:0}.related-grid{grid-template-columns:1fr}.catalog-tools label{flex-wrap:wrap}}
+@media(max-width:640px){.size-guide,.help-layout {grid-template-columns:1fr;gap:20px}.size-guide article{padding:24px}.catalog-tools{align-items:flex-start}.related-grid{grid-template-columns:1fr}.catalog-tools label{flex-wrap:wrap}}
 
-.region-trigger{display:flex;align-items:center;gap:6px;max-width:170px;font-size:12px;text-align:left;padding:8px;min-height:44px}.region-trigger span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.region-dialog{border:0;padding:0;border-radius:26px;background:var(--ground);color:var(--ink);width:min(760px,calc(100% - 32px));max-height:90dvh;overflow:auto;box-shadow:var(--shadow-lg)}
-.region-dialog[open]{display:grid;grid-template-columns:.85fr 1.15fr}.region-dialog::backdrop{background:rgba(25,20,10,.66);backdrop-filter:blur(5px)}
-.region-close{position:absolute;right:12px;top:10px;z-index:2;border-radius:50%;width:44px;height:44px;background:var(--ground);font-size:28px}
-.region-art{background:var(--brand);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:hidden}.region-art img{width:100%;filter:var(--drop)}.region-art span{font:800 25px/1.1 var(--font-display);align-self:flex-start;padding:20px 8px;letter-spacing:-.5px}
-.region-content{padding:48px 30px 28px}.region-content h2{font:800 clamp(32px,5vw,46px)/1.05 var(--font-display);letter-spacing:-1px;margin:12px 0 18px}.region-content>p{margin-bottom:20px}.region-content label{display:block;font-weight:600;font-size:14px;margin-bottom:8px}
-.region-field{display:flex;flex-direction:column;gap:10px}.region-field input{border:1px solid var(--line-strong);border-radius:10px;background:white;padding:14px;width:100%;font-size:20px}.region-field button{min-height:48px}.region-content .fine-print{font-size:12px;margin:16px 0 4px}.region-content .text-action{margin-right:12px}
-@media(max-width:640px){.region-dialog[open]{grid-template-columns:1fr}.region-art{height:150px;flex-direction:row;padding:8px 26px}.region-art img{width:155px}.region-art span{font-size:20px;align-self:center}.region-content{padding:24px}.region-content h2 br{display:none}.region-content h2{font-size:32px}.region-trigger{max-width:105px}}
+
+/* --------------------------------------------------------------------------
+   Entrar — reaproveita .modal/.modal__scrim/.modal__card do checkout
+   -------------------------------------------------------------------------- */
+.auth[hidden] { display: none; }
+.auth__card { width: min(440px, calc(100vw - 32px)); padding: var(--sp-7) var(--sp-6) var(--sp-6); text-align: left; }
+.auth__close { position: absolute; top: 10px; right: 10px; }
+.auth__card h2 { font: 800 30px/1.08 var(--font-display); letter-spacing: -.8px; margin: var(--sp-2) 0 var(--sp-2); }
+.auth__sub { margin: 0 0 var(--sp-5); color: var(--ink-2); font-size: 14.5px; }
+
+/* Os dois provedores tem o mesmo peso visual: nenhum e "o caminho certo". */
+.auth__sso {
+  width: 100%; min-height: 50px; margin-bottom: var(--sp-3);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  border: 1.5px solid var(--line-strong); border-radius: var(--r-full);
+  background: var(--surface); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; font-weight: 600;
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.auth__sso:hover { border-color: var(--ink); background: var(--ground); }
+
+.auth__or {
+  display: flex; align-items: center; gap: var(--sp-3);
+  margin: var(--sp-5) 0; color: var(--ink-3); font-size: 13px;
+}
+.auth__or::before, .auth__or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+.auth__card label { display: block; font-size: 14px; font-weight: 600; margin-bottom: var(--sp-2); }
+.auth__field { display: flex; flex-direction: column; gap: var(--sp-3); }
+.auth__field input {
+  min-height: 50px; padding: 0 var(--sp-4);
+  border: 1.5px solid var(--line-strong); border-radius: var(--r-md);
+  background: var(--surface); font-family: var(--font-body); font-size: 16px; color: var(--ink);
+}
+.auth__field input:focus-visible { border-color: var(--ink); }
+.auth__field input[aria-invalid="true"] { border-color: var(--danger); }
+.auth__field .btn { min-height: 50px; }
+.auth__card .fine-print { margin: var(--sp-5) 0 0; font-size: 12px; }
