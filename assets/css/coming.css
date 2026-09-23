@@ -136,10 +136,7 @@ main {
   padding: clamp(20px, 3vh, 40px) clamp(20px, 3vw, 48px);
 }
 
-/* O elenco sobe visualmente sem mudar de lugar no HTML. */
-.cast { order: -1; }
-
-.say { width: 100%; max-width: 660px; text-align: center; }
+.say { width: 100%; max-width: 900px; text-align: center; }
 
 .eyebrow {
   display: flex; align-items: center; justify-content: center; gap: 12px;
@@ -147,56 +144,15 @@ main {
   font-size: 11.5px; font-weight: 600; letter-spacing: .26em;
   color: var(--brand-soft);
 }
-.eyebrow span { width: 26px; height: 1px; background: currentColor; flex: none; }
 
-/* Peso secundário: o título continua sendo o h1, mas em corpo e peso menores
-   — quem manda na tela agora são as fotos. */
+/* Título em escala de destaque, disputando a atenção com as fotos. */
 h1 {
   margin: 14px 0 0;
-  font: 700 clamp(26px, 2.9vw, 40px)/1.12 'Bricolage Grotesque', sans-serif;
+  font: 700 clamp(52px, 5.8vw, 80px)/1.12 'Bricolage Grotesque', sans-serif;
   letter-spacing: -.028em;
   text-wrap: nowrap;
 }
 h1 em { font-style: normal; color: var(--brand); }
-
-.intro {
-  margin: 14px auto 0; max-width: 52ch;
-  font-size: 15.5px; line-height: 1.6; color: var(--paper-2);
-}
-
-/* Formulário --------------------------------------------------------------- */
-form { max-width: 440px; margin: 24px auto 0; }
-form > label { display: block; margin-bottom: 11px; font-size: 14px; font-weight: 600; }
-
-.email-field {
-  display: flex; gap: 6px; padding: 6px;
-  background: var(--paper); border-radius: 14px;
-  box-shadow: 0 12px 46px rgb(0 0 0 / .45);
-}
-.email-field input {
-  flex: 1; min-width: 0; border: 0; background: transparent;
-  padding: 13px 14px; color: #262319; outline-offset: -2px;
-}
-.email-field input::placeholder { color: #6C6858; }
-.email-field input[aria-invalid="true"] { outline: 2px solid #C0261B; outline-offset: -2px; }
-
-.email-field button {
-  border: 0; border-radius: 9px; padding: 15px 20px;
-  background: var(--brand); color: #221B05;
-  font-weight: 700; white-space: nowrap;
-  transition: background 140ms var(--ease);
-}
-.email-field button:hover:not(:disabled) { background: #FFD65E; }
-.email-field button:disabled { opacity: .55; cursor: not-allowed; }
-.email-field button span { margin-left: 9px; }
-
-#formMessage { margin: 12px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--brand-soft); }
-#formMessage:empty { display: none; }
-#formMessage[data-erro="1"] { color: #FFB3A6; }
-
-.privacy { margin: 14px 0 0; font-size: 12px; line-height: 1.6; color: var(--paper-2); }
-
-.honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 
 /* O elenco -----------------------------------------------------------------
    Seis fotos, cada uma uma vez, em lugar fixo — agora em faixa larga e no
@@ -230,14 +186,12 @@ form > label { display: block; margin-bottom: 11px; font-size: 14px; font-weight
 .cast li:nth-child(even) { transform: translateY(clamp(10px, 1.2vw, 20px)); }
 
 /* Entrada: acontece uma vez, no carregamento. Não é laço.
-   A ordem dos atrasos segue o que se vê (elenco primeiro), não o HTML. */
+   Primeiro o texto, depois o elenco, na mesma ordem em que aparecem. */
 @media (prefers-reduced-motion: no-preference) {
   .say > *, .cast { animation: sobe .7s var(--ease) backwards; }
-  .cast li { animation: sobe .6s var(--ease) backwards; animation-delay: calc(.1s + var(--i) * .07s); }
-  .eyebrow { animation-delay: .52s; }
-  h1       { animation-delay: .58s; }
-  .intro   { animation-delay: .64s; }
-  form     { animation-delay: .7s; }
+  .cast li { animation: sobe .6s var(--ease) backwards; animation-delay: calc(.3s + var(--i) * .07s); }
+  .eyebrow { animation-delay: .1s; }
+  h1       { animation-delay: .16s; }
   .cast    { animation: none; }
 }
 @keyframes sobe { from { opacity: 0; transform: translateY(16px); } }
@@ -247,8 +201,6 @@ form > label { display: block; margin-bottom: 11px; font-size: 14px; font-weight
   .cast li:nth-child(even) { animation-name: sobe-par; }
 }
 
-.noscript { position: relative; z-index: 4; text-align: center; padding: 0 24px; }
-
 :focus-visible { outline: 3px solid var(--brand); outline-offset: 4px; border-radius: 4px; }
 
 /* Telas menores ------------------------------------------------------------ */
@@ -256,7 +208,7 @@ form > label { display: block; margin-bottom: 11px; font-size: 14px; font-weight
   main { gap: clamp(26px, 4vh, 40px); justify-content: flex-start; padding-top: clamp(18px, 3vh, 32px); }
   .cast ul { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: clamp(18px, 3vw, 28px); }
   .cast li:nth-child(even) { transform: none; animation-name: sobe; }
-  h1 { font-size: clamp(26px, 4.6vw, 38px); }
+  h1 { font-size: clamp(52px, 9.2vw, 76px); }
 }
 
 @media (max-width: 640px) {
@@ -264,17 +216,8 @@ form > label { display: block; margin-bottom: 11px; font-size: 14px; font-weight
   header img { width: 100px; }
   .status { font-size: 10px; letter-spacing: .12em; max-width: 140px; line-height: 1.5; }
   main { padding: 18px 20px 0; }
-  h1 { font-size: clamp(24px, 6.4vw, 34px); letter-spacing: -.024em; }
-  .intro { font-size: 15px; }
-  .email-field { flex-wrap: wrap; }
-  .email-field input { flex-basis: 100%; }
-  .email-field button { width: 100%; }
+  /* o dobro não cabe: a linha mais longa tem ~8,7em, então o corpo é o que a
+     largura útil (100vw - 40px de respiro) comporta */
+  h1 { font-size: min(68px, calc((100vw - 40px) / 9)); letter-spacing: -.024em; }
   footer { flex-direction: column; gap: 10px; text-align: center; font-size: 11.5px; }
-}
-
-/* O título não quebra (text-wrap: nowrap), então em telas muito estreitas ele
-   precisa encolher — senão estoura para fora em vez de passar para a linha
-   de baixo. Abaixo de 320 px não há aparelho comum, mas há zoom de texto. */
-@media (max-width: 380px) {
-  h1 { font-size: clamp(19px, 6.2vw, 26px); }
 }

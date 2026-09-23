@@ -38,29 +38,12 @@
   <span class="status"><i aria-hidden="true"></i> ABRINDO EM BREVE</span>
 </header>
 
-<!-- A ordem aqui é fala → elenco, e só o CSS inverte (order: -1). Assim o
-     leitor de tela encontra o h1 antes do h2; o elenco não tem nada focável,
-     então a ordem de tabulação não se desencontra do que se vê. -->
+<!-- Fala em cima, elenco embaixo: a ordem do HTML é a mesma da tela. -->
 <main>
   <div class="say">
-    <p class="eyebrow"><span aria-hidden="true"></span> COLEÇÃO 01</p>
+    <p class="eyebrow">COLEÇÃO 01</p>
 
     <h1>Fazemos patos.<br><em>Só que diferentes.</em></h1>
-
-    <p class="intro">Seis personagens com nome, fantasia e temperamento próprios. Nenhum deles foi feito para a banheira.</p>
-
-    <form id="notifyForm" novalidate>
-      <label for="email">Avisamos no dia que a loja abrir.</label>
-      <div class="email-field">
-        <input id="email" name="email" type="email" autocomplete="email" maxlength="254"
-               placeholder="seu@email.com" required aria-describedby="formMessage privacy">
-        <button type="submit" id="notifyButton">Quero saber <span aria-hidden="true">↗</span></button>
-      </div>
-      <!-- isca para robô: fora da tela e fora da ordem de tabulação -->
-      <div class="honeypot" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
-      <p id="formMessage" role="status"></p>
-      <p class="privacy" id="privacy">Um e-mail só, no dia da inauguração. Depois disso, silêncio.</p>
-    </form>
   </div>
 
   <!-- O elenco: cada pato aparece uma única vez e fica onde está. -->
@@ -80,6 +63,5 @@
   <span>© 2026 Duck Dodgers</span>
 </footer>
 
-<noscript><p class="noscript">Ative o JavaScript para cadastrar seu e-mail.</p></noscript>
 </body>
 </html>
